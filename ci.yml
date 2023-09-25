@@ -1,0 +1,39 @@
+
+name: Continuous Integration
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+env:
+  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
+  BUILD_TYPE: Debug
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: install dependencies
+        shell: bash
+        run: |
+          sudo ./docker/install-dependencies.sh
+      - name: build 3rd libraries.
+        timeout-minutes: 30
+        shell: bash
+        run: |
+          ./3rdtools.sh install
+          tar -czf 3rd.tar.gz 3rd/
+          git config --global user.email "you@example.com"
+          git config --global user.name "Your Name"
+          # wget https://raw.githubusercontent.com/WWWWMMM/3rd/main/3rd.tar.gz -O 3rd.tar.gz
+          # tar -xzf 3rd.tar.gz
+          git add 3rd.tar.gz
+          git commit -m "g"
+          git push 
